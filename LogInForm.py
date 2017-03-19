@@ -1,12 +1,14 @@
 from tkinter import *
 import json
 
-class LoginForm:
+class TLoginForm:
+
+    quit = False
 
     def __init__(self, parent):
 
         if __debug__:
-            print("Begin Show Login Form")
+            print("[TLoginForm::Init] Begin Show Login Form")
 
         # ------------------------------------------- FRAMES ----------------------------------------------------------
         self.frame_login_credentials = Frame(bd=5)
@@ -52,19 +54,19 @@ class LoginForm:
         self.text_password .grid(row = 0, column = 3, padx = 5, pady = 10)
 
         # ------------------------------------------- LOGIN BUTTON ----------------------------------------------------------
-        self.button_login = Button(self.frame_login_button, text='Log In', width=10, height=1, font='arial 10', command=self.SaveParams)
+        self.button_login = Button(self.frame_login_button, text='Log In', width=10, height=1, font='arial 10', command=self.login)
 
         self.button_login.pack(padx = 10, pady = 10)
 
-        self.LoadParams("settings.json")
+        self.load_params("settings.json")
 
         if __debug__:
-            print("Finish Show Login Form")
+            print("[TLoginForm::Init] Finish Show Login Form")
 
-    def LoadParams(self, filename):
+    def load_params(self, filename):
 
         if __debug__:
-            print("Begin Load Start Parameters")
+            print("[TLoginForm::load_params] Begin Load Start Parameters")
 
         try:
             with open(filename, "r") as json_data:
@@ -87,84 +89,96 @@ class LoginForm:
             if "password" in params["login"]:
                 self.text_password.insert(END, params["login"]["password"])
 
-        if "access" in params:
+        if "scope" in params:
 
-            if "messages" in params["access"]:
-                if(params["access"]["messages"] == "true"):
+            if "messages" in params["scope"]:
+                if(params["scope"]["messages"] == "true"):
                     self.checkbox_messages.select()
 
-            if "friends" in params["access"]:
-                 if(params["access"]["friends"] == "true"):
+            if "friends" in params["scope"]:
+                 if(params["scope"]["friends"] == "true"):
                     self.checkbox_friends.select()
 
-            if "groups" in params["access"]:
-                 if(params["access"]["groups"] == "true"):
+            if "groups" in params["scope"]:
+                 if(params["scope"]["groups"] == "true"):
                     self.checkbox_groups.select()
 
-            if "video" in params["access"]:
-                 if(params["access"]["video"] == "true"):
+            if "video" in params["scope"]:
+                 if(params["scope"]["video"] == "true"):
                     self.checkbox_video.select()
 
-            if "audio" in params["access"]:
-                 if(params["access"]["audio"] == "true"):
+            if "audio" in params["scope"]:
+                 if(params["scope"]["audio"] == "true"):
                     self.checkbox_audio.select()
 
-            if "photos" in params["access"]:
-                 if(params["access"]["photos"] == "true"):
+            if "photos" in params["scope"]:
+                 if(params["scope"]["photos"] == "true"):
                     self.checkbox_photos.select()
 
         if __debug__:
-            print("Finish Load Start Parameters")
+            print("[TLoginForm::load_params] Finish Load Start Parameters")
 
-    def SaveParams(self, filename = "settings.json"):
-
+    def save_params(self, filename = "settings.json"):
         if __debug__:
-            print("Begin Save Start Parameters")
+            print("[TLoginForm::save_params] Begin Save Start Parameters")
 
         params = {}
 
         if(self.text_login.get("1.0", "1.end") != ""):
-            if "access" not in params:
+            if "login" not in params:
                 params["login"] = {}
             params["login"]["login"] = self.text_login.get("1.0", "1.end")
 
         if (self.text_password.get("1.0", "1.end") != ""):
-            if "access" not in params:
+            if "login" not in params:
                 params["login"] = {}
             params["login"]["password"] = self.text_password.get("1.0", "1.end")
 
         if(self.checkbox_messages_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["messages"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["messages"] = "true"
 
         if (self.checkbox_friends_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["friends"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["friends"] = "true"
 
         if (self.checkbox_groups_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["groups"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["groups"] = "true"
 
         if (self.checkbox_video_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["video"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["video"] = "true"
 
         if (self.checkbox_audio_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["audio"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["audio"] = "true"
 
         if (self.checkbox_photos_res.get()):
-            if "access" not in params:
-                params["access"] = {}
-            params["access"]["photos"] = "true"
+            if "scope" not in params:
+                params["scope"] = {}
+            params["scope"]["photos"] = "true"
 
         with open(filename, "w") as json_data:
             json.dump(params, json_data)
 
         if __debug__:
-            print("Finish Save Start Parameters")
+            print("[TLoginForm::save_params] Finish Save Start Parameters")
+
+    def login(self):
+        self.label_password.config(fg="black")
+        self.label_login.config(fg="black")
+
+        if (self.text_login.get("1.0", "1.end") != ""):
+            if (self.text_password.get("1.0", "1.end")):
+                self.save_params();
+                self.quit = True;
+            else:
+                self.label_password.config(fg="red")
+        else:
+            self.label_login.config(fg="red")
