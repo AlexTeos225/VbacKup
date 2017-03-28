@@ -10,8 +10,16 @@ class TVKHelper:
         if __debug__:
             print("[TVKHelper::authorize] Try to authorize with parameters:", params)
 
-        session = vk.AuthSession(app_id='5874117', user_login = params["login"]["login"], user_password = params["login"]["password"],
-                                 scope = 'messages')
+        try:
+            session = vk.AuthSession(app_id='5874117', user_login = params["login"]["login"], user_password = params["login"]["password"], scope = params["scope"])
+        except vk.exceptions.VkAuthError as e:
+            if __debug__:
+                print("[TVKHelper::authorize] VkAuthError Exeption: ", e)
+            return 0
+
+        if __debug__:
+            print("[TVKHelper::authorize] Authorize succeed")
+
         api = vk.API(session)
 
         return api
@@ -22,7 +30,9 @@ class TVKHelper:
                 messages_count = self.api.messages.getHistory(count=0, user_id=uid)[0]
             else:
                 messages_count = count
-        except vk.exceptions.VkAPIError:
+        except vk.exceptions.VkAPIError as e:
+            if __debug__:
+                print("[TVKHelper::get_user_messages] VkAPIError: ", e)
             time.sleep(3)
             messages_count = self.api.messages.getHistory(count=0, user_id=uid)[0]
 
@@ -43,7 +53,9 @@ class TVKHelper:
                     messages.append(res[i + 1])
                     i = i + 1
 
-            except vk.exceptions.VkAPIError:
+            except vk.exceptions.VkAPIError as e:
+                if __debug__:
+                    print("[TVKHelper::get_user_messages] VkAPIError: ", e)
                 time.sleep(1)
             else:
                 offset = offset + offset_size
