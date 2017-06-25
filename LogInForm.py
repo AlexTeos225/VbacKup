@@ -12,10 +12,12 @@ class TLoginForm:
 
         # ------------------------------------------- FRAMES ----------------------------------------------------------
         self.frame_login_credentials = Frame(bd=5)
+        self.frame_login_token       = Frame(bd=5)
         self.frame_login_parameters  = Frame(bd=5)
         self.frame_login_button      = Frame(bd=5)
 
         self.frame_login_credentials.pack()
+        self.frame_login_token.pack()
         self.frame_login_parameters.pack()
         self.frame_login_button.pack()
 
@@ -53,6 +55,15 @@ class TLoginForm:
         self.label_password.grid(row = 0, column = 2, padx = 5, pady = 10)
         self.text_password .grid(row = 0, column = 3, padx = 5, pady = 10)
 
+        # ------------------------------------------- LOGIN TOKEN ----------------------------------------------------------
+        self.text_token = Text(self.frame_login_token, height=1, width=40, font='Arial 10')
+
+        self.label_token = Label(self.frame_login_token, text='Token:', width=6, height=1, font='arial 10')
+
+        self.text_token.grid(row = 1, column = 1, padx = 5, pady = 10)
+
+        self.label_token.grid(row = 1, column = 0, padx = 5, pady = 10)
+
         # ------------------------------------------- LOGIN BUTTON ----------------------------------------------------------
         self.button_login = Button(self.frame_login_button, text='Log In', width=10, height=1, font='arial 10', command=self.login)
 
@@ -74,11 +85,11 @@ class TLoginForm:
                     params = json.load(json_data)
                 except:
                     if __debug__:
-                        print("Incorrect Setting File")
+                        print("[TLoginForm::load_params] Incorrect Setting File")
                     return
         except FileNotFoundError:
             if __debug__:
-                print("Setting File Not Found")
+                print("[TLoginForm::load_params] Setting File Not Found")
             return
 
         if "login" in params:
@@ -88,6 +99,9 @@ class TLoginForm:
 
             if "password" in params["login"]:
                 self.text_password.insert(END, params["login"]["password"])
+
+            if "token" in params["login"]:
+                self.text_token.insert(END, params["login"]["token"])
 
         if "scope" in params:
 
@@ -134,6 +148,11 @@ class TLoginForm:
                 params["login"] = {}
             params["login"]["password"] = self.text_password.get("1.0", "1.end")
 
+        if (self.text_token.get("1.0", "1.end") != ""):
+            if "login" not in params:
+                params["login"] = {}
+            params["login"]["token"] = self.text_token.get("1.0", "1.end")
+
         if(self.checkbox_messages_res.get()):
             if "scope" not in params:
                 params["scope"] = {}
@@ -174,11 +193,15 @@ class TLoginForm:
         self.label_password.config(fg="black")
         self.label_login.config(fg="black")
 
-        if (self.text_login.get("1.0", "1.end") != ""):
-            if (self.text_password.get("1.0", "1.end")):
-                self.save_params();
-                self.quit = True;
+        if(self.text_token.get("1.0", "1.end") == ""):
+            if (self.text_login.get("1.0", "1.end") != ""):
+                if (self.text_password.get("1.0", "1.end")):
+                    self.save_params();
+                    self.quit = True;
+                else:
+                    self.label_password.config(fg="red")
             else:
-                self.label_password.config(fg="red")
+                self.label_login.config(fg="red")
         else:
-            self.label_login.config(fg="red")
+            self.save_params();
+            self.quit = True;

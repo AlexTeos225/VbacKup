@@ -19,7 +19,7 @@ class TMainForm:
 
         self.vk_helper = TVKHelper(self, params)
 
-        UserMessages = self.vk_helper.get_user_messages("377639131", 10)
+        UserMessages = self.vk_helper.get_user_messages("15637879", 30, 0)
 
         for message in UserMessages:
             self.text.insert(END, message['body'])

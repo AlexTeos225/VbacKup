@@ -11,8 +11,8 @@ if __name__ == '__main__':
     login_form = TLoginForm(root)
 
     i = 0
-    #while(login_form.quit != True):
-    while(i < 100):
+    while(login_form.quit != True):
+    #while(i < 100):
         i = i + 1
         root.update()
 
@@ -20,8 +20,12 @@ if __name__ == '__main__':
     params = {}
     params["login"] = {}
 
-    params["login"]["login"] = login_form.text_login.get("1.0", "1.end")
-    params["login"]["password"] = login_form.text_password.get("1.0", "1.end")
+    if(login_form.text_login.get("1.0", "1.end") != ""):
+        params["login"]["login"] = login_form.text_login.get("1.0", "1.end")
+        params["login"]["password"] = login_form.text_password.get("1.0", "1.end")
+
+    if (login_form.text_token.get("1.0", "1.end") != ""):
+        params["login"]["token"] = login_form.text_token.get("1.0", "1.end")
 
     scope = ""
     if (login_form.checkbox_messages_res.get()):
